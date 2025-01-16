@@ -4,6 +4,7 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 #This is how we will route people to the webpage. To route to a new webpage, simply make a new version of this.
+#We can also use these functions to make custom methods. Look up the flask documentation for how to pass variables in.
 @app.route("/")
 def index():
     return render_template("index.html", app_data=app_data)

@@ -1,28 +1,14 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Insert Title Here</title>
-    <!--Uncomment this after we've decided a logo--> 
-    <!--<link rel="icon" href="../../../../favicon.ico">-->
+{% extends 'layout.html' %}
 
-    <!--Bootstrap Core CSS-->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css"> 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-  </head>
-  <body>
-    <!--to Edit the Navbar, go to includes/_navbar.html-->
-    {% include 'includes/_navbar.html' %}
+{% block body %}
+<div>
     <!--
-    This is the default webpage all users will be directed to.
-    Build the Body of the Webpage Here. We will eventually use this for the 'layout.html' file in the future.
+    This is the default webpage to which all users will be directed.
+    To edit the layout of the content outside of this section, go to layout.html.
     Use Bootstrap 5.3 and build the basic structure here for right now.
     For any values that will need to be replaced with a changing variable, 
-      label it as a placeholeder with a comment stating its functionality, before sending a message to the GroupMe.
-    This is the format we will use for all the webpages.
+      label it as a placeholder with a comment stating its functionality, before sending a message to GroupMe.
+    This is the format we will use for all the web pages.
     -->
-    <main role="main" class="container_fluid">
-      
-    </main>
-  </body>
-</html>
+</div>
+{% endblock %}

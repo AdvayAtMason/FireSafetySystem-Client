@@ -7,9 +7,9 @@ app = Flask(__name__)
 #We can also use these functions to make custom methods. Look up the flask documentation for how to pass variables in.
 @app.route("/")
 def index():
-    return render_template("index.html", app_data=app_data)
+    return render_template("index.html")
 
 #This is is the program to run the server on a Localhost PC.
 #We recommend that you run this on a virtual machine (NOTE: All VENV Folders are ignored) on Windows 10 or newer
 if __name__ == "__main__":
-    app.run(debug=DEVELOPMENT_ENV)
+    app.run()

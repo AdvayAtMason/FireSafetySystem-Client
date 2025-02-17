@@ -1,7 +1,20 @@
+#Import all Necessary Modules
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from flask_wtf import wtforms
 
-#Initialize the App
+#Initialize the App and Database
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+db = SQLAlchemy(app)
+app.config["SECRET_KEY"] = "thisisanotsosecretkey"
+
+#User Class
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
+    password = db.Column(db.String(80), nullable=False)
 
 #This is how we will route people to the webpage. To route to a new webpage, simply make a new version of this.
 #We can also use these functions to make custom methods. Look up the flask documentation for how to pass variables in.

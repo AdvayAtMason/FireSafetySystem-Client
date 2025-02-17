@@ -2,7 +2,9 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from flask_wtf import wtforms
+from flask_wtf import FlaskForm
+import wtforms
+from wtforms import validators
 
 #Initialize the App and Database
 app = Flask(__name__)
@@ -15,6 +17,19 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
+
+#Class for the Registration Form
+class Registration(FlaskForm):
+    username = wtforms.StringField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    password = wtforms.PasswordField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    submit = wtforms.SubmitField("Submit")
+
+
+#Class for the Login Form
+class Login(FlaskForm):
+    username = wtforms.StringField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    password = wtforms.PasswordField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    submit = wtforms.SubmitField("Submit")
 
 #This is how we will route people to the webpage. To route to a new webpage, simply make a new version of this.
 #We can also use these functions to make custom methods. Look up the flask documentation for how to pass variables in.

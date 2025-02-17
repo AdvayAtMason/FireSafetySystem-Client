@@ -17,6 +17,14 @@ def about():
 def contact():
     return render_template("contact.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    return render_template("login.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    return render_template("register.html")
+
 #This is is the program to run the server on a Localhost PC.
 #We recommend that you run this on a virtual machine (NOTE: All VENV Folders are ignored) on Windows 10 or newer
 if __name__ == "__main__":

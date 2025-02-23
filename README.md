@@ -9,7 +9,6 @@ Information:
 
 Requirements (to run on Virtual Environment)
 - Python 3.10 or Greater
-- Python Dependencies:
 -   Flask
 -   Flask-SQLAlchemy
 -   Flask-Login

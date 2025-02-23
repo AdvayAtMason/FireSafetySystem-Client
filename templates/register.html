@@ -5,5 +5,13 @@
     <!--
     This is where we write the register form
     -->
+    <h1>Register Page</h1>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        {{ form.username }}
+        {{ form.password }}
+        {{ form.submit }}
+    </form>
+    <p>Already have an account, <a href="/login">Log in uere</a></p>
 </div>
 {% endblock %}

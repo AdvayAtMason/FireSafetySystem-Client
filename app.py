@@ -1,8 +1,9 @@
 #Import all Necessary Modules
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
+from flask_login import UserMixin, LoginManager, login_required, login_user
 from flask_wtf import FlaskForm
+from flask_bcrypt import Bcrypt
 import wtforms
 from wtforms import validators
 
@@ -10,7 +11,19 @@ from wtforms import validators
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
+
+#Information regarding hashing of passwords
 app.config["SECRET_KEY"] = "thisisanotsosecretkey"
+bcrypt = Bcrypt(app)
+
+#Initialize Login Manager
+login_mananager = LoginManager()
+login_mananager.init_app()
+login_mananager.login_view = "login"
+
+@login_mananager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 #User Class
 class User(db.Model, UserMixin):
@@ -22,14 +35,20 @@ class User(db.Model, UserMixin):
 class Registration(FlaskForm):
     username = wtforms.StringField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Username"})
     password = wtforms.PasswordField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Password"})
-    submit = wtforms.SubmitField("Submit")
+    submit = wtforms.SubmitField("Register")
+
+    def validate_username(self, username):
+        existing_user_username = User.query.filter_by(username=username.data).first()
+
+        if existing_user_username:
+            raise validators.ValidationError("That username already exists. Please choose a different one.")
 
 
 #Class for the Login Form
 class Login(FlaskForm):
     username = wtforms.StringField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Username"})
     password = wtforms.PasswordField(validators=[validators.InputRequired(), validators.length(min=4, max=20)], render_kw={"placeholder": "Password"})
-    submit = wtforms.SubmitField("Submit")
+    submit = wtforms.SubmitField("Login")
 
 #This is how we will route people to the webpage. To route to a new webpage, simply make a new version of this.
 #We can also use these functions to make custom methods. Look up the flask documentation for how to pass variables in.
@@ -47,11 +66,34 @@ def contact():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+    form = Login()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                login_user()
+                return redirect("/dashboard")
+    
+    return render_template("login.html", form=form)
+
+@app.route("/dashboard", methods=["GET"])
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    form = Registration()
+
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_user = User(username=form.username.data, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect("/login")
+
+    return render_template("register.html", form=form)
 
 #This is is the program to run the server on a Localhost PC.
 #We recommend that you run this on a virtual machine (NOTE: All VENV Folders are ignored) on Windows 10 or newer

@@ -3,11 +3,16 @@ Client for NSTEM Biomed Froject for 2024-25
 
 Information:
 - Intended Operating System: Windows (Might add Linux compatablilty in the future)
-- Backend: Flask, MySQL
+- Backend: Flask, SQLite
 - Template/Frontend: Bootstrap 5.3
 - Programming Languages: Python, HTML5, CSS3, SQL
 
 Requirements (to run on Virtual Environment)
 - Python 3.10 or Greater
-- Flask
-- MySQL
+- Python Dependencies:
+-   Flask
+-   Flask-SQLAlchemy
+-   Flask-Login
+-   Flask-Bcrypt
+-   Flask-WTF
+-   WTForms

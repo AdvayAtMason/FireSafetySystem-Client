@@ -11,6 +11,9 @@ from wtforms import validators
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
+app.app_context().push()
+with app.app_context():
+    db.create_all()
 
 #Information regarding hashing of passwords
 app.config["SECRET_KEY"] = "thisisanotsosecretkey"
@@ -72,7 +75,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user()
+                login_user(user)
                 return redirect("/dashboard")
     
     return render_template("login.html", form=form)

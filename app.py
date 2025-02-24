@@ -18,7 +18,7 @@ bcrypt = Bcrypt(app)
 
 #Initialize Login Manager
 login_mananager = LoginManager()
-login_mananager.init_app()
+login_mananager.init_app(app)
 login_mananager.login_view = "login"
 
 @login_mananager.user_loader

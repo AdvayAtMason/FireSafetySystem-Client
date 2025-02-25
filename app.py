@@ -1,7 +1,7 @@
 #Import all Necessary Modules
 from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, LoginManager, login_required, login_user
+from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user
 from flask_wtf import FlaskForm
 from flask_bcrypt import Bcrypt
 import wtforms
@@ -84,6 +84,12 @@ def login():
 @login_required
 def dashboard():
     return render_template("dashboard.html")
+
+@app.route("/logout", methods=["GET", "POST"])
+@login_required
+def logout():
+    logout_user()
+    return redirect("/login")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

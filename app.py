@@ -67,6 +67,7 @@ def about():
 def contact():
     return render_template("contact.html")
 
+#App route to login page. Upon user submission of the form, if the user exists and can be validated, it redirects them to the dashboard page.
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = Login()
@@ -80,11 +81,13 @@ def login():
     
     return render_template("login.html", form=form)
 
+#App route to dashboard page. This is the default page all users are directed to upon login.
 @app.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard():
     return render_template("dashboard.html")
 
+#App route to logout user. This route has no page content. If the user is logged in, it will automatically log them out and redirect them to the login page.
 @app.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():

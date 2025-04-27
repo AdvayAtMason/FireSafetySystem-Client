@@ -1,5 +1,5 @@
 # FireSafetySystem-Client
-Client for NSTEM Biomed Froject for 2024-25
+Client for NSTEM Biomed Project for 2024-25
 
 Information:
 - Intended Operating System: Windows (Might add Linux compatibility in the future)

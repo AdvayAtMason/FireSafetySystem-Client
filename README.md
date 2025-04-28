@@ -2,7 +2,7 @@
 Client for NSTEM Biomed Project for 2024-25
 
 Information:
-- Intended Operating System: Windows (Might add Linux compatibility in the future)
+- Intended Operating System: Windows 7+, Linux
 - Backend: Flask, SQLite
 - Template/Frontend: Bootstrap 5.3
 - Programming Languages: Python, HTML5, CSS3, SQL

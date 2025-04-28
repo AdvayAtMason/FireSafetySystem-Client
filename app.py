@@ -35,14 +35,16 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-    alarms = db.relationship('Alarm', backref='user', lazy=True)
+    #alarms = db.relationship('Alarm', backref='user', lazy=True)
 
+"""
 class Alarm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     time = db.Column(db.String(20), nullable=False)  # Store time as a string (e.g., "HH:MM")
     message = db.Column(db.String(200), nullable=True)  # Optional message for the alarm
     user = db.relationship('User', backref=db.backref('alarms', lazy=True))
+"""
 
 #Class for the Registration Form
 class Registration(FlaskForm):

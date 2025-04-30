@@ -40,8 +40,9 @@ class User(db.Model, UserMixin):
 class Alarm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    time = db.Column(db.String(20), nullable=False)  # Store time as a string (e.g., "HH:MM")
-    message = db.Column(db.String(200), nullable=True)  # Optional message for the alarm
+    #time = db.Column(db.String(20), nullable=False)  # Store time as a string (e.g., "HH:MM")
+    #message = db.Column(db.String(200), nullable=True)  # Optional message for the alarm
+    state = db.Column(db.Integer, nullable=False)
     user = db.relationship('User', backref=db.backref('alarms', lazy=True))
 
 #Class for the Registration Form
@@ -121,6 +122,10 @@ def register():
         return redirect("/login")
 
     return render_template("register.html", form=form)
+
+@app.route("/update_state/id=<alarm_id>/state=<state>")
+def update_state():
+    alarm = Alarm.query.filter_by(id = alarm_id).first()
 
 #This is is the program to run the server on a Localhost PC.
 #We recommend that you run this on a virtual machine (NOTE: All VENV Folders are ignored) on Windows 10 or newer

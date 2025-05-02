@@ -1,7 +1,7 @@
 #Import all Necessary Modules
 from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user, current_user
+from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user
 from flask_wtf import FlaskForm
 from flask_bcrypt import Bcrypt
 import wtforms
@@ -15,8 +15,6 @@ db = SQLAlchemy(app)
 app.app_context().push()
 with app.app_context():
     db.create_all()
-    #inspector = db.engine.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    #print("Existing tables:", [row[0] for row in inspector])
 
 #Dictionary for Alarm Data
 alarm_data = {}
@@ -39,17 +37,14 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-    #alarms = db.relationship('Alarm', backref='user', lazy=True)
+    alarms = db.relationship('Alarm', backref='user', lazy=True)
 
-"""
 class Alarm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    #time = db.Column(db.String(20), nullable=False)  # Store time as a string (e.g., "HH:MM")
-    #message = db.Column(db.String(200), nullable=True)  # Optional message for the alarm
-    state = db.Column(db.Integer, nullable=False)
+    time = db.Column(db.String(20), nullable=False)  # Store time as a string (e.g., "HH:MM")
+    message = db.Column(db.String(200), nullable=True)  # Optional message for the alarm
     user = db.relationship('User', backref=db.backref('alarms', lazy=True))
-"""
 
 #Class for the Registration Form
 class Registration(FlaskForm):
@@ -102,12 +97,7 @@ def login():
 @app.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard():
-    if not current_user.is_authenticated:
-        return redirect("/login")
-    else:
-        print(f"Logged-in User ID: {current_user.id}, Username: {current_user.username}")
-        return render_template("dashboard.html", username=current_user.username)
-    #return render_template("dashboard.html")
+    return render_template("dashboard.html")
 
 #App route to logout user. This route has no page content. If the user is logged in, it will automatically log them out and redirect them to the login page.
 @app.route("/logout", methods=["GET", "POST"])

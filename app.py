@@ -16,9 +16,6 @@ app.app_context().push()
 with app.app_context():
     db.create_all()
 
-#Dictionary for Alarm Data
-alarm_data = {}
-
 #Information regarding hashing of passwords
 app.config["SECRET_KEY"] = "thisisanotsosecretkey"
 bcrypt = Bcrypt(app)

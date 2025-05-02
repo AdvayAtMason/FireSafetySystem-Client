@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from flask_bcrypt import Bcrypt
 import wtforms
 from wtforms import validators
+import json
 
 #Initialize the App and Database
 app = Flask(__name__)
@@ -35,8 +36,9 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-    alarms = db.relationship('Alarm', backref='user', lazy=True)
+    #alarms = db.relationship('Alarm', backref='user', lazy=True)
 
+"""
 class Alarm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -44,6 +46,7 @@ class Alarm(db.Model):
     #message = db.Column(db.String(200), nullable=True)  # Optional message for the alarm
     state = db.Column(db.Integer, nullable=False)
     user = db.relationship('User', backref=db.backref('alarms', lazy=True))
+"""
 
 #Class for the Registration Form
 class Registration(FlaskForm):

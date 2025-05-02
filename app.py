@@ -18,6 +18,9 @@ with app.app_context():
     #inspector = db.engine.execute("SELECT name FROM sqlite_master WHERE type='table';")
     #print("Existing tables:", [row[0] for row in inspector])
 
+#Dictionary for Alarm Data
+alarm_data = {}
+
 #Information regarding hashing of passwords
 app.config["SECRET_KEY"] = "thisisanotsosecretkey"
 bcrypt = Bcrypt(app)

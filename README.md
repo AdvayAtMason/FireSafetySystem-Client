@@ -1,8 +1,5 @@
 # FireSafetySystem-Client
 Client for NSTEM Biomed Project for 2024-25
-Alarm Development Branch.
-
-Note: Alarm code has been added. It will not interfere with the rest of the program.
 
 Information:
 - Intended Operating System: Windows 7+, Linux (Debian 11+ based distros)

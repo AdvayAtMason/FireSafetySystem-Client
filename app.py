@@ -8,7 +8,7 @@ import wtforms
 from wtforms import validators
 import json
 
-#Initialize the App and Database
+#Initialize the App and Database 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)

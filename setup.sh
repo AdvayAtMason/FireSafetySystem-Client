@@ -9,8 +9,32 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
+# Check if pip is installed
+if ! command -v pip3 &> /dev/null; then
+    echo "pip is not installed. Please install pip and try again."
+    exit 1
+fi
+
+# Check if requirements.txt exists
+if [ ! -f requirements.txt ]; then
+    echo "requirements.txt not found. Please ensure it exists in the current directory."
+    exit 1
+fi
+
+# Check if virtualenv is installed
+if ! python3 -m pip show virtualenv &> /dev/null; then
+    echo "virtualenv is not installed. Installing virtualenv..."
+    pip3 install virtualenv
+fi
+
 # Create a virtual environment
-python3 -m venv venv
+if [ -d "venv" ]; then
+    echo "Virtual environment already exists. Skipping creation."
+else
+    echo "Creating virtual environment..."
+    python3 -m venv venv
+fi
+
 
 # Check if the virtual environment was created successfully
 if [ ! -d "venv" ]; then

@@ -18,6 +18,9 @@ with app.app_context():
     #inspector = db.engine.execute("SELECT name FROM sqlite_master WHERE type='table';")
     #print("Existing tables:", [row[0] for row in inspector])
 
+if open("data/alarm_data.json", "r").read() == "":
+    alarm_data = {}
+
 with open("data/alarm_data.json", "r") as f:
     # Load the JSON data from the file
     alarm_data = json.load(f)

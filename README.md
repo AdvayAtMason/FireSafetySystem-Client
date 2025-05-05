@@ -7,6 +7,10 @@ Information:
 - Template/Frontend: Bootstrap 5.3
 - Programming Languages: Python, HTML5, CSS3, SQL
 
+How to create a necessary virtual environment:
+- Step 1: Make sure that python3 is installed and pip is added to path
+- Step 2: Navigate to the project directory, and run the setup script in terminal.
+
 Requirements (to run on Virtual Environment)
 - Python 3.10 or Greater
 -   Flask

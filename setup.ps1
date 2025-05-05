@@ -1,3 +1,4 @@
+# NOTE: This script will be moved to the scripts directory in the future.
 # Windows PowerShell Script - Windows 10 and later
 # Script to set up a Python virtual environment and install dependencies
 

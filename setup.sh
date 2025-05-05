@@ -1,3 +1,4 @@
+# NOTE: This script will be moved to the scripts directory in the future.
 # Linux Bash Script - Debian/Ubuntu
 # Script to set up a Python virtual environment and install dependencies
 

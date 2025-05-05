@@ -10,7 +10,7 @@ Information:
 How to create a necessary virtual environment:
 - Step 1: Make sure that Python3 is installed and pip is added to the path
 - Step 2: Navigate to the project directory and run the setup script in the terminal.
-  Windows: Run ```setup.ps1```
+  Windows: Run ```setup.ps1```.
   Linux: Make the setup script executable by running ```sudo chmod +x setup.sh``` and then run ```./setup.sh```
 
 Requirements (to run on Virtual Environment)

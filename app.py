@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from flask_bcrypt import Bcrypt
 import wtforms
 from wtforms import validators
-#import json
+import json
 
 #Initialize the App and Database 
 app = Flask(__name__)
@@ -17,6 +17,11 @@ with app.app_context():
     db.create_all()
     #inspector = db.engine.execute("SELECT name FROM sqlite_master WHERE type='table';")
     #print("Existing tables:", [row[0] for row in inspector])
+
+with open("data/alarm_data.json", "r") as f:
+    # Load the JSON data from the file
+    alarm_data = json.load(f)
+    print("Alarm Data Loaded:", alarm_data)
 
 #Information regarding hashing of passwords
 app.config["SECRET_KEY"] = "thisisanotsosecretkey"

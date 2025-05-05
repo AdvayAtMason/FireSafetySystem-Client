@@ -8,10 +8,10 @@ Information:
 - Programming Languages: Python, HTML5, CSS3, SQL
 
 How to create a necessary virtual environment:
-- Step 1: Make sure that python3 is installed and pip is added to path
-- Step 2: Navigate to the project directory, and run the setup script in terminal.
-  Windows: Run '''setup.ps1'''
-  Linux: Make the setup script executable by running '''sudo chmod +x setup.sh''' and then run '''./setup.sh'''
+- Step 1: Make sure that Python3 is installed and pip is added to the path
+- Step 2: Navigate to the project directory and run the setup script in the terminal.
+  Windows: Run ```setup.ps1```
+  Linux: Make the setup script executable by running ```sudo chmod +x setup.sh``` and then run ```./setup.sh```
 
 Requirements (to run on Virtual Environment)
 - Python 3.10 or Greater
@@ -21,3 +21,4 @@ Requirements (to run on Virtual Environment)
 -   Flask-Bcrypt
 -   Flask-WTF
 -   WTForms
+NOTE: All Python dependencies can be found in the requirements.txt file

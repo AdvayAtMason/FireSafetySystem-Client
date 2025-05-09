@@ -1,21 +1,16 @@
-#include <iostream>
-#include <string>
-// I'm 90% sure that the above dependencies are unneeded, but I can't check at the time of writing this, so I will leave these in just in case
-
 #include <WiFi.h>
 #include "Arduino.h"
 #include "DFRobotDFPlayerMini.h"
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #define FPSerial Serial1
 
 
+  // This is the simple code that the alarm runs on. It initializes an access point at "ESP32-Access-Point" with password "123456789" that you connect to to access its webpage (line 338).
+  // There is also commented out code (lines 341 - 350) that can connect to an existing wifi network, so, as long as the client is connected to that network, they can connect to each other that way.
+  // When a client connects to the root, the alarm sends back a wbepage to be displayed on the client side (lines 368 - 370). If you want to use a different webpage, comment out that part.
+  // You can control the alarm with several endpoints (lines 368 - 513). Here are such endpoints:
 
-
-
-
-  // This is the simple code that the alarm runs on. It initializes an access point at "ESP32-AP" with password "123" that you connect to to access its webpage (line 350).
-  // There is also commented out code (lines 425 - 434) that can connect to an existing wifi network, so, as long as the client is connected to that network, they can connect to each other that way.
-  // When a client connects to it, the alarm sends back a wbepage to be displayed on the client side (lines 505 - 506). If you want to use a different webpage, comment out that part.
-  // You can control the alarm with several endpoints (lines 424 - 503). Here are such endpoints:
     // GET /LED/toggle - toggles the LED on or off when in "inactive" mode
     // GET /LED/white - changes the LED color to white
     // GET /LED/red - changes the LED color to red
@@ -38,36 +33,33 @@
   // One thing to note about the post requests is that the body should be completely empty except for just the value you want to send. If you want to send a value of 0.5 to
     // GET /LED/brightness, then send the body as 0.5, not value=0.5 or brightness=0.5.
 
-  // Credits to https://randomnerdtutorials.com/esp32-web-server-arduino-ide/, https://randomnerdtutorials.com/esp32-access-point-ap-web-server/, and ChatGPT.
+  // Credits to https://randomnerdtutorials.com/esp32-web-server-arduino-ide/, https://randomnerdtutorials.com/esp32-access-point-ap-web-server/,
+  // https://randomnerdtutorials.com/esp32-async-web-server-espasyncwebserver-library/, and ChatGPT.
     
 
 
-// Alarm settings
 DFRobotDFPlayerMini myDFPlayer;
 void printDetail(uint8_t type, int value);
 
 // Can be "inactive" or "active"
 String alarmMode = "inactive";
 
+// LED settings
 int redBaseBrightness = 255;
 int greenBaseBrightness = 255;
 int blueBaseBrightness = 160;
-int colorCycle = 1;
 float brightness = 0;
 float brightnessFactor = 1;
-
 float fadeAmount = 0.25;
-int fadeCycle = 1;
-int buttonState = 0;
-int buttonLock = 0;
 
+// Speaker settings
 float alarmVolume = 1;
 int timer = 0;
 int TIMER_INTERVAL = 8650;
 
 
 // Server settings
-WiFiServer server(80);
+AsyncWebServer server(80);
 String header;
 
 String ledState = "off";
@@ -293,8 +285,7 @@ const String html = R"rawliteral(
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', path, true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.send(value);
-                xhr.send('   ');
+                xhr.send('data=' + value);
             }
 
             function toggleLED() {
@@ -342,18 +333,21 @@ void setup() {
   pinMode(12, OUTPUT);
   pinMode(27, OUTPUT);
 
-  // Connect to WiFi
+  // Use access point
+  Serial.println("Connecting...");
+  WiFi.softAP("ESP32-Access-Point", "123456789");
+  Serial.println(WiFi.softAPIP());
+
+  // Use WiFi
   // char* ssid = "";
   // char* password = "";
-  Serial.println("Connecting...");
+  // Serial.println("Connecting...");
   // WiFi.begin(ssid, password);
-  WiFi.softAP("ESP32-AP", "123");
   // while (WiFi.status() != WL_CONNECTED) {
   //   delay(500);
   //   Serial.print(".");
   // }
-  // Serial.println(WiFi.localIP());
-  Serial.println(WiFi.softAPIP());
+  // Serial.println(WiFi.localIP());;
 
   // Setup DFPlayer
   FPSerial.begin(9600, SERIAL_8N1, /*rx =*/A1, /*tx =*/A0);
@@ -370,163 +364,167 @@ void setup() {
   }
   Serial.println(F("DFPlayer Mini online."));
 
+  // Root, returns the website
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", getHTML());
+  });
+
+  // GET /LED/toggle
+  server.on("/LED/toggle", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ledState == "off") {
+      Serial.println("LED on");
+      ledState = "on";
+    } else {
+      Serial.println("LED off");
+      ledState = "off";
+    }
+    request->send(200);
+  });
+
+  // GET /LED/white
+  server.on("/LED/white", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("White");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 255;
+    blueBaseBrightness = 160;
+    request->send(200);
+  });
+
+  // GET /LED/red
+  server.on("/LED/red", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Red");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 0;
+    blueBaseBrightness = 0;
+    request->send(200);
+  });
+
+  // GET /LED/orange
+  server.on("/LED/orange", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Orange");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 20;
+    blueBaseBrightness = 0;
+    request->send(200);
+  });
+
+  // GET /LED/yellow
+  server.on("/LED/yellow", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Yellow");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 70;
+    blueBaseBrightness = 0;
+    request->send(200);
+  });
+
+  // GET /LED/lime
+  server.on("/LED/lime", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Lime");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 255;
+    blueBaseBrightness = 0;
+    request->send(200);
+  });
+
+  // GET /LED/green
+  server.on("/LED/green", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Green");
+    redBaseBrightness = 0;
+    greenBaseBrightness = 255;
+    blueBaseBrightness = 0;
+    request->send(200);
+  });
+
+  // GET /LED/cyan
+  server.on("/LED/cyan", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Cyan");
+    redBaseBrightness = 0;
+    greenBaseBrightness = 255;
+    blueBaseBrightness = 255;
+    request->send(200);
+  });
+
+  // GET /LED/blue
+  server.on("/LED/blue", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Blue");
+    redBaseBrightness = 0;
+    greenBaseBrightness = 0;
+    blueBaseBrightness = 255;
+    request->send(200);
+  });
+
+  // GET /LED/purple
+  server.on("/LED/purple", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Purple");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 0;
+    blueBaseBrightness = 200;
+    request->send(200);
+  });
+
+  // GET /LED/pink
+  server.on("/LED/pink", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Pink");
+    redBaseBrightness = 255;
+    greenBaseBrightness = 0;
+    blueBaseBrightness = 35;
+    request->send(200);
+  });
+
+  // POST /LED/brightness
+  server.on("/LED/brightness", HTTP_POST, [](AsyncWebServerRequest *request) {
+    Serial.println("Change brightness");
+    if (request->hasParam("data", true)) {
+      brightnessFactor = request->getParam("data", true)->value().toFloat();
+    }
+    request->send(200);
+  });
+
+  // GET /alarm/activate
+  server.on("/alarm/activate", HTTP_GET, [](AsyncWebServerRequest *request) {
+    myDFPlayer.play(1);
+    request->send(200);
+  });
+
+  // POST /alarm/volume
+  server.on("/alarm/volume", HTTP_POST, [](AsyncWebServerRequest *request) {
+    if (request->hasParam("data", true)) {
+      alarmVolume = request->getParam("data", true)->value().toFloat();
+    }
+    myDFPlayer.volume(30 * alarmVolume);
+    request->send(200);
+  });
+
+  // GET /mode/toggle
+  server.on("/mode/toggle", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (alarmMode == "inactive") {
+      brightness = 0;
+      if (fadeAmount < 0) {
+        fadeAmount = fadeAmount * -1;
+      }
+      timer = millis();
+      alarmMode = "active";
+      myDFPlayer.play(1);
+    } else {
+      myDFPlayer.stop();
+      alarmMode = "inactive";
+    }
+    request->send(200);
+  });
+
+
   // Start server
   server.begin();
 }
 
+// Continuously updates the LED and alarm based on active settings
 void loop() {
   updateLED();
   loopAlarm();
-  WiFiClient client = server.available();   // Listen for incoming clients
-
-  if (client) {                             // If a new client connects,
-    currentTime = millis();
-    previousTime = currentTime;
-    Serial.println("New Client.");          // print a message out in the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
-    String body = "";
-    bool isPost = false;
-    bool readingBody = false;
-    // && currentTime - previousTime <= timeoutTime
-    while (client.connected()) {  // loop while the client's connected
-      currentTime = millis();
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        header += c;
-        if (c == '\n') {                    // if the byte is a newline character
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            if (isPost) {
-              int numConsecutiveSpaces = 0;
-              while (client.available()) {
-                c = client.read();
-                if (c == ' ') {
-                  numConsecutiveSpaces += 1;
-                  if (numConsecutiveSpaces == 3) {
-                    break;
-                  }
-                } else {
-                  numConsecutiveSpaces = 0;
-                }
-                body += c;
-              }
-            }
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-
-            // Endpoint handling
-            if (header.indexOf("GET /LED/toggle") >= 0) {
-              if (ledState == "off") {
-                Serial.println("LED on");
-                ledState = "on";
-              } else {
-                Serial.println("LED off");
-                ledState = "off";
-              }
-            } else if (header.indexOf("GET /LED/white") >= 0) {
-              Serial.println("White");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 255;
-              blueBaseBrightness = 160;
-            } else if (header.indexOf("GET /LED/red") >= 0) {
-              Serial.println("Red");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 0;
-              blueBaseBrightness = 0;
-            } else if (header.indexOf("GET /LED/orange") >= 0) {
-              Serial.println("Orange");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 20;
-              blueBaseBrightness = 0;
-            } else if (header.indexOf("GET /LED/yellow") >= 0) {
-              Serial.println("Yellow");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 70;
-              blueBaseBrightness = 0;
-            } else if (header.indexOf("GET /LED/lime") >= 0) {
-              Serial.println("Lime");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 255;
-              blueBaseBrightness = 0;
-            } else if (header.indexOf("GET /LED/green") >= 0) {
-              Serial.println("Green");
-              redBaseBrightness = 0;
-              greenBaseBrightness = 255;
-              blueBaseBrightness = 0;
-            } else if (header.indexOf("GET /LED/cyan") >= 0) {
-              Serial.println("Cyan");
-              redBaseBrightness = 0;
-              greenBaseBrightness = 255;
-              blueBaseBrightness = 255;
-            } else if (header.indexOf("GET /LED/blue") >= 0) {
-              Serial.println("Blue");
-              redBaseBrightness = 0;
-              greenBaseBrightness = 0;
-              blueBaseBrightness = 255;
-            } else if (header.indexOf("GET /LED/purple") >= 0) {
-              Serial.println("Purple");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 0;
-              blueBaseBrightness = 200;
-            } else if (header.indexOf("GET /LED/pink") >= 0) {
-              Serial.println("Pink");
-              redBaseBrightness = 255;
-              greenBaseBrightness = 0;
-              blueBaseBrightness = 35;
-            } else if (header.indexOf("GET /alarm/activate") >= 0) {
-              myDFPlayer.play(1);
-            } else if (header.indexOf("GET /mode/toggle") >= 0) {
-              if (alarmMode == "inactive") {
-                brightness = 0;
-                if (fadeAmount < 0) {
-                  fadeAmount = fadeAmount * -1;
-                }
-                timer = millis();
-                alarmMode = "active";
-                myDFPlayer.play(1);
-              } else {
-                myDFPlayer.stop();
-                alarmMode = "inactive";
-              }
-            } else if (header.indexOf("POST /LED/brightness") >= 0) {
-              Serial.println("Change brightness");
-              brightnessFactor = body.toFloat();
-            } else if (header.indexOf("POST /alarm/volume") >= 0) {
-              alarmVolume = body.toFloat();
-              myDFPlayer.volume(30 * alarmVolume);
-            }
-
-            client.println(getHTML());
-            client.println();
-
-            // Break out of the while loop
-            break;
-          } else { // if you got a newline, then clear currentLine
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-          if (currentLine.startsWith("POST")) {
-            isPost = true;
-          }
-        }
-      }
-    }
-    // Clear the header variable
-    header = "";
-    // Close the connection
-    client.stop();
-    Serial.println("Client disconnected");
-  }
   delay(1);
 }
 
+// Update the LED based on active settings. When alarm is active, flash LED. When inactive, allow manual control via website
 void updateLED() {
   // Active alarm mode
   if (alarmMode == "active") {
@@ -558,6 +556,7 @@ void updateLED() {
   }
 }
 
+// Loop the alarm continuously if the alarm is active
 void loopAlarm() {
   if (alarmMode == "active") {
     if (millis() - timer >= TIMER_INTERVAL) {

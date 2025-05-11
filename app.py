@@ -21,6 +21,15 @@ with app.app_context():
 if open("data/alarm_data.json", "r").read() == "":
     alarm_data = {}
 
+class Alarm:
+    def __init__(self):
+        self.id = 0
+        self.ip = ""
+        self.users = []
+        self.led_state = "off"
+        self.alarm_state = False
+
+
 with open("data/alarm_data.json", "r") as f:
     # Load the JSON data from the file
     alarm_data = json.load(f)

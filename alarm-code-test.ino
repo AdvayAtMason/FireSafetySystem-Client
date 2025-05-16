@@ -6,38 +6,6 @@
 #define FPSerial Serial1
 
 
-  // This is the simple code that the alarm runs on. It initializes an access point at "ESP32-Access-Point" with password "123456789" that you connect to to access its webpage (line 338).
-  // There is also commented out code (lines 341 - 350) that can connect to an existing wifi network, so, as long as the client is connected to that network, they can connect to each other that way.
-  // When a client connects to the root, the alarm sends back a wbepage to be displayed on the client side (lines 368 - 370). If you want to use a different webpage, comment out that part.
-  // You can control the alarm with several endpoints (lines 368 - 513). Here are such endpoints:
-
-    // GET /LED/toggle - toggles the LED on or off when in "inactive" mode
-    // GET /LED/white - changes the LED color to white
-    // GET /LED/red - changes the LED color to red
-    // GET /LED/orange - changes the LED color to orange
-    // GET /LED/yellow - changes the LED color to yellow
-    // GET /LED/lime - changes the LED color to lime
-    // GET /LED/green - changes the LED color to green
-    // GET /LED/cyan - changes the LED color to cyan
-    // GET /LED/blue - changes the LED color to blue
-    // GET /LED/purple - changes the LED color to purple
-    // GET /LED/pink - changes the LED color to pink
-    // POST /LED/brightness - sets the brightness of the LED to the posted value. Should be between 0.00 and 1.00
-
-    // GET /alarm/activate - plays one iteration of the alarm sound (when the alarm is in "active" mode, it loops the alarm sound infinitely)
-    // POST /alarm/volume - sets the volume of the alarm to the posted value. Should be between 0.00 and 1.00
-
-    // GET /mode/toggle - toggles the mode between inactive and active. inactive means the alarm is not going off and you can manually activate either the led or the speaker via
-      // the web app. Active means that the alarm is going off.
-
-  // One thing to note about the post requests is that the body should be completely empty except for just the value you want to send. If you want to send a value of 0.5 to
-    // GET /LED/brightness, then send the body as 0.5, not value=0.5 or brightness=0.5.
-
-  // Credits to https://randomnerdtutorials.com/esp32-web-server-arduino-ide/, https://randomnerdtutorials.com/esp32-access-point-ap-web-server/,
-  // https://randomnerdtutorials.com/esp32-async-web-server-espasyncwebserver-library/, and ChatGPT.
-    
-
-
 DFRobotDFPlayerMini myDFPlayer;
 void printDetail(uint8_t type, int value);
 
@@ -185,10 +153,10 @@ String getRequest(String serverName) {
 
 String getProperty(JSONVar json, String key) {
   JSONVar keys = json.keys();
-  // for (int i = 0; i < keys.length(); i++) {
-  //   if key.equalsIgnoreCase(keys[i]) {
-  //     return json[keys[i]];
-  //   }
-  // }
-  Serial.println(keys[0]);
+  for (int i = 0; i < keys.length(); i++) {
+     if key.equalsIgnoreCase(keys[i]) {
+       return json[keys[i]];
+     }
+   }
+   Serial.println(keys[0]);
 }
